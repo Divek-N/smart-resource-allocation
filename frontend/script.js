@@ -1,133 +1,93 @@
 const API = "http://localhost:3000";
 
-/* Resource maps */
-const resourceMap = {
-    1: "Conference Hall",
-    2: "Meeting Room A",
-    3: "Meeting Room B",
-    4: "Seminar Hall"
-};
+/* Load bookings when page loads */
+document.addEventListener("DOMContentLoaded", () => {
+    loadBookings();
+});
 
-const resourceReverseMap = {
-    "Conference Hall": 1,
-    "Meeting Room A": 2,
-    "Meeting Room B": 3,
-    "Seminar Hall": 4
-};
-
-/* Save user names locally */
-function saveUserName(id, name) {
-    const data = JSON.parse(localStorage.getItem("bookingUsers")) || {};
-    data[id] = name;
-    localStorage.setItem("bookingUsers", JSON.stringify(data));
-}
-
-function getUserName(id, userId) {
-    const data = JSON.parse(localStorage.getItem("bookingUsers")) || {};
-    return data[id] || `User ${userId}`;
-}
-
-function removeUserName(id) {
-    const data = JSON.parse(localStorage.getItem("bookingUsers")) || {};
-    delete data[id];
-    localStorage.setItem("bookingUsers", JSON.stringify(data));
-}
-
-/* Helpers */
-function fmt(d) {
-    return new Date(d).toLocaleString();
-}
-
-/* Load bookings */
-function loadBookings() {
-    fetch(API + "/bookings")
-        .then(res => res.json())
-        .then(res => {
-            const rows = document.getElementById("rows");
-            rows.innerHTML = "";
-
-            res.data.forEach(b => {
-                rows.innerHTML += `
-                <tr>
-                    <td>${getUserName(b.id, b.user_id)}</td>
-                    <td>${resourceMap[b.resource_id]}</td>
-                    <td>${fmt(b.start_time)}</td>
-                    <td>${fmt(b.end_time)}</td>
-                    <td>
-                        <button class="delete-btn"
-                            onclick="deleteBooking(${b.id})">
-                            Delete
-                        </button>
-                    </td>
-                </tr>`;
-            });
-        });
-}
-
-/* Book */
+/* BOOK FUNCTION – FIXED */
 function book() {
-    const name = userName.value.trim();
-    const resource = resourceName.value;
-    const start = startTime.value;
-    const end = endTime.value;
+    const userName = document.getElementById("userName").value.trim();
+    const resourceName = document.getElementById("resourceName").value;
+    const startTime = document.getElementById("startTime").value;
+    const endTime = document.getElementById("endTime").value;
 
-    if (!name || !resource || !start || !end) {
-        alert("Fill all fields");
+    if (!userName || !resourceName || !startTime || !endTime) {
+        alert("⚠️ Please fill all fields");
         return;
     }
 
-    fetch(API + "/book", {
+    fetch(`${API}/book`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            userId: 1,
-            resourceId: resourceReverseMap[resource],
-            startTime: start,
-            endTime: end
+            userId: userName,
+            resourceId: resourceName,
+            startTime,
+            endTime
         })
     })
-    .then(res => res.json())
-    .then(res => {
-        if (!res.success) {
-            alert("Already booked");
-            return;
-        }
-
-        fetch(API + "/bookings")
-            .then(r => r.json())
-            .then(r => {
-                const last = r.data[r.data.length - 1];
-                saveUserName(last.id, name);
-                clearForm();
-                loadBookings();
-            });
+    .then(async res => {
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        return data;
+    })
+    .then(() => {
+        alert("✅ Booking Successful");
+        clearForm();
+        loadBookings();
+    })
+    .catch(err => {
+        alert(err.message || "❌ Booking failed");
     });
 }
 
-/* Delete */
-function deleteBooking(id) {
-    if (!confirm("Delete this booking?")) return;
+/* LOAD BOOKINGS – FIXED */
+function loadBookings() {
+    fetch(`${API}/bookings`)
+        .then(res => res.json())
+        .then(result => {
+            const rows = document.getElementById("rows");
+            rows.innerHTML = "";
 
-    fetch(API + "/booking/" + id, { method: "DELETE" })
-        .then(() => {
-            removeUserName(id);
-            loadBookings();
+            result.data.forEach(b => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${b.user_id}</td>
+                    <td>${b.resource_id}</td>
+                    <td>${formatDate(b.start_time)}</td>
+                    <td>${formatDate(b.end_time)}</td>
+                    <td>
+                        <button class="delete-btn" onclick="deleteBooking(${b.id})">
+                            Delete
+                        </button>
+                    </td>
+                `;
+                rows.appendChild(tr);
+            });
+        })
+        .catch(() => {
+            alert("❌ Error loading bookings");
         });
 }
 
-/* Clear form */
-function clearForm() {
-    userName.value = "";
-    resourceName.value = "";
-    startTime.value = "";
-    endTime.value = "";
+/* DELETE */
+function deleteBooking(id) {
+    if (!confirm("Delete this booking?")) return;
+
+    fetch(`${API}/bookings/${id}`, { method: "DELETE" })
+        .then(() => loadBookings())
+        .catch(() => alert("❌ Delete failed"));
 }
 
-/* Input refs */
-const userName = document.getElementById("userName");
-const resourceName = document.getElementById("resourceName");
-const startTime = document.getElementById("startTime");
-const endTime = document.getElementById("endTime");
+/* HELPERS */
+function clearForm() {
+    document.getElementById("userName").value = "";
+    document.getElementById("resourceName").value = "";
+    document.getElementById("startTime").value = "";
+    document.getElementById("endTime").value = "";
+}
 
-/* Initial load */
-loadBookings();
+function formatDate(dt) {
+    return new Date(dt).toLocaleString();
+}

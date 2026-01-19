@@ -16,80 +16,131 @@ const db = mysql.createConnection({
 
 db.connect(err => {
     if (err) {
-        console.error("❌ DB Error:", err);
+        console.error("❌ MySQL connection failed:", err);
     } else {
         console.log("✅ MySQL Connected");
     }
 });
 
-/* Health */
+/* ===================== */
+/* HEALTH CHECK */
+/* ===================== */
 app.get("/", (req, res) => {
-    res.json({ success: true, message: "Backend running" });
+    res.json({ success: true });
 });
 
-/* Get bookings */
+/* ===================== */
+/* GET BOOKINGS */
+/* ===================== */
 app.get("/bookings", (req, res) => {
-    db.query("SELECT * FROM bookings ORDER BY start_time", (err, results) => {
+    db.query("SELECT * FROM bookings ORDER BY start_time", (err, rows) => {
         if (err) {
+            console.error(err);
             return res.status(500).json({ success: false });
         }
-        res.json({ success: true, data: results });
+        res.json({ success: true, data: rows });
     });
 });
 
-/* Book */
+/* ===================== */
+/* CREATE BOOKING */
+/* ===================== */
 app.post("/book", (req, res) => {
     const { userId, resourceId, startTime, endTime } = req.body;
 
     if (!userId || !resourceId || !startTime || !endTime) {
-        return res.status(400).json({ success: false });
+        return res.status(400).json({
+            success: false,
+            message: "All fields are required"
+        });
     }
 
-    const start = startTime.replace("T", " ") + ":00";
-    const end = endTime.replace("T", " ") + ":00";
+    // ✅ SAFE LOCAL DATETIME (NO UTC)
+    const startSQL = startTime.replace("T", " ") + ":00";
+    const endSQL = endTime.replace("T", " ") + ":00";
 
+    if (endSQL <= startSQL) {
+        return res.status(400).json({
+            success: false,
+            message: "End time must be after start time"
+        });
+    }
+
+    // ✅ CORRECT CONFLICT CHECK
     const conflictSQL = `
-        SELECT * FROM bookings
+        SELECT id FROM bookings
         WHERE resource_id = ?
         AND start_time < ?
         AND end_time > ?
     `;
 
-    db.query(conflictSQL, [resourceId, end, start], (err, rows) => {
-        if (rows.length > 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Already booked"
-            });
-        }
-
-        const insertSQL = `
-            INSERT INTO bookings (user_id, resource_id, start_time, end_time)
-            VALUES (?, ?, ?, ?)
-        `;
-
-        db.query(insertSQL, [userId, resourceId, start, end], err => {
+    db.query(
+        conflictSQL,
+        [resourceId, endSQL, startSQL],
+        (err, conflicts) => {
             if (err) {
+                console.error("❌ Conflict error:", err);
+                return res.status(500).json({
+                    success: false,
+                    message: "Conflict check failed"
+                });
+            }
+
+            if (conflicts.length > 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Hall already booked for this time"
+                });
+            }
+
+            // ✅ INSERT
+            const insertSQL = `
+                INSERT INTO bookings (user_id, resource_id, start_time, end_time)
+                VALUES (?, ?, ?, ?)
+            `;
+
+            db.query(
+                insertSQL,
+                [userId, resourceId, startSQL, endSQL],
+                err => {
+                    if (err) {
+                        console.error("❌ Insert error:", err);
+                        return res.status(500).json({
+                            success: false,
+                            message: "Insert failed"
+                        });
+                    }
+
+                    res.json({
+                        success: true,
+                        message: "Booking successful"
+                    });
+                }
+            );
+        }
+    );
+});
+
+/* ===================== */
+/* DELETE BOOKING */
+/* ===================== */
+app.delete("/bookings/:id", (req, res) => {
+    db.query(
+        "DELETE FROM bookings WHERE id = ?",
+        [req.params.id],
+        err => {
+            if (err) {
+                console.error(err);
                 return res.status(500).json({ success: false });
             }
             res.json({ success: true });
-        });
-    });
-});
-
-/* Delete booking */
-app.delete("/booking/:id", (req, res) => {
-    const id = req.params.id;
-
-    db.query("DELETE FROM bookings WHERE id = ?", [id], err => {
-        if (err) {
-            return res.status(500).json({ success: false });
         }
-        res.json({ success: true });
-    });
+    );
 });
 
-/* Start server */
+/* ===================== */
+/* START SERVER */
+/* ===================== */
 app.listen(3000, () => {
-    console.log("🚀 Backend running at http://localhost:3000");
+    console.log("🚀 Server running on http://localhost:3000");
 });

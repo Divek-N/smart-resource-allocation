@@ -7,59 +7,62 @@
 </head>
 <body>
 
-<div class="page">   <!-- FULL SCREEN WRAPPER -->
+<div class="page">
 
     <header class="brand">
         <div class="logo">🏢 Allocato</div>
-        <div class="tagline">Smart Hall & Resource Booking System</div>
+        <div class="tagline">Smart Resource Allocation System</div>
     </header>
 
-    <main class="content">  <!-- MAIN CONTENT -->
+    <main class="content">
 
         <section class="card">
             <h2>Book a Hall</h2>
-            <p class="subtitle">Enter your name, choose a hall, and book your time</p>
 
             <div class="form-grid">
-                <input placeholder="Enter your name">
-                <select>
-                    <option>Conference Hall</option>
-                    <option>Meeting Room A</option>
-                    <option>Meeting Room B</option>
-                    <option>Seminar Hall</option>
+                <input id="userName" placeholder="Enter your name">
+
+                <select id="resourceName">
+                    <option value="">Select Hall</option>
+                    <option value="Conference Hall">Conference Hall</option>
+                    <option value="Meeting Room A">Meeting Room A</option>
+                    <option value="Meeting Room B">Meeting Room B</option>
+                    <option value="Seminar Hall">Seminar Hall</option>
                 </select>
-                <input type="datetime-local">
-                <input type="datetime-local">
+
+                <input id="startTime" type="datetime-local">
+                <input id="endTime" type="datetime-local">
             </div>
 
-            <button class="primary-btn">Confirm Booking</button>
+            <!-- IMPORTANT: type="button" -->
+            <button type="button" onclick="book()">Confirm Booking</button>
         </section>
 
         <section class="card">
             <h2>Current Bookings</h2>
-            <p class="subtitle">Live hall reservations</p>
 
             <table>
                 <thead>
                     <tr>
                         <th>User Name</th>
                         <th>Hall</th>
-                        <th>Start Time</th>
-                        <th>End Time</th>
+                        <th>Start</th>
+                        <th>End</th>
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody id="rows"></tbody>
             </table>
         </section>
 
     </main>
 
     <footer>
-        © 2026 Allocato • Professional Resource Booking
+        © 2026 Allocato organisation
     </footer>
 
 </div>
 
+<script src="script.js"></script>
 </body>
 </html>
