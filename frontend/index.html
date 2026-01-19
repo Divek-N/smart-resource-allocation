@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Allocato – Smart Resource Booking</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="page">   <!-- FULL SCREEN WRAPPER -->
+
+    <header class="brand">
+        <div class="logo">🏢 Allocato</div>
+        <div class="tagline">Smart Hall & Resource Booking System</div>
+    </header>
+
+    <main class="content">  <!-- MAIN CONTENT -->
+
+        <section class="card">
+            <h2>Book a Hall</h2>
+            <p class="subtitle">Enter your name, choose a hall, and book your time</p>
+
+            <div class="form-grid">
+                <input placeholder="Enter your name">
+                <select>
+                    <option>Conference Hall</option>
+                    <option>Meeting Room A</option>
+                    <option>Meeting Room B</option>
+                    <option>Seminar Hall</option>
+                </select>
+                <input type="datetime-local">
+                <input type="datetime-local">
+            </div>
+
+            <button class="primary-btn">Confirm Booking</button>
+        </section>
+
+        <section class="card">
+            <h2>Current Bookings</h2>
+            <p class="subtitle">Live hall reservations</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>User Name</th>
+                        <th>Hall</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <footer>
+        © 2026 Allocato • Professional Resource Booking
+    </footer>
+
+</div>
+
+</body>
+</html>

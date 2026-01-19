@@ -1,0 +1,202 @@
+* {
+    box-sizing: border-box;
+    font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+/* Base layout */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    background: linear-gradient(135deg, #e3f2fd, #ffffff);
+    color: #333;
+    overflow-x: hidden;
+}
+
+/* Page wrapper – full window */
+.page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 10px 20px;
+}
+
+/* ========================= */
+/* Header */
+/* ========================= */
+
+.brand {
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 25px;
+}
+
+.logo {
+    font-size: 36px;
+    font-weight: 700;
+    color: #0d47a1;
+}
+
+.tagline {
+    color: #555;
+    font-size: 15px;
+}
+
+/* ========================= */
+/* Main content */
+/* ========================= */
+
+.content {
+    flex: 1;
+}
+
+/* ========================= */
+/* Cards */
+/* ========================= */
+
+.card {
+    width: 100%;
+    background: #ffffff;
+    padding: 30px 34px;
+    margin-bottom: 32px;
+    border-radius: 18px;
+    box-shadow: 0 14px 32px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+    margin-bottom: 6px;
+    color: #1565c0;
+}
+
+.subtitle {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+/* ========================= */
+/* Form */
+/* ========================= */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+input, select {
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 2px rgba(25,118,210,0.15);
+}
+
+/* ========================= */
+/* Buttons */
+/* ========================= */
+
+button,
+.primary-btn {
+    background: linear-gradient(135deg, #1976d2, #0d47a1);
+    color: white;
+    padding: 12px 26px;
+    border: none;
+    border-radius: 28px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+button:hover,
+.primary-btn:hover {
+    opacity: 0.92;
+}
+
+/* Delete button */
+.delete-btn {
+    background: #e53935;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.delete-btn:hover {
+    background: #b71c1c;
+}
+
+/* ========================= */
+/* Table */
+/* ========================= */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+thead {
+    background: #1976d2;
+    color: white;
+}
+
+th, td {
+    padding: 14px;
+    text-align: center;
+}
+
+tbody tr:nth-child(even) {
+    background: #f4f6f8;
+}
+
+tbody tr:hover {
+    background: #e3f2fd;
+}
+
+/* ========================= */
+/* Footer */
+/* ========================= */
+
+footer {
+    text-align: center;
+    color: #777;
+    font-size: 13px;
+    margin-top: auto;
+    padding-bottom: 10px;
+}
+
+/* ========================= */
+/* Responsive */
+/* ========================= */
+
+@media (max-width: 900px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    button,
+    .primary-btn {
+        width: 100%;
+    }
+
+    .logo {
+        font-size: 28px;
+    }
+
+    th, td {
+        font-size: 13px;
+        padding: 10px;
+    }
+}
